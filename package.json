@@ -1,0 +1,19 @@
+{
+  "name": "sovereignty-elite-telemetry",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purrcat259/sovereignty-elite-telemetry.git"
+  },
+  "author": "purrcat259",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/purrcat259/sovereignty-elite-telemetry/issues"
+  },
+  "homepage": "https://github.com/purrcat259/sovereignty-elite-telemetry#readme"
+}
