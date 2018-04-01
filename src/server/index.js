@@ -4,7 +4,10 @@ import * as path from "path";
 const app = express();
 
 
-app.use('/', express.static(path.resolve('./src/server/public')));
+app.use('/', (req, res) => {
+    res.send('Hello World');
+});
+
 app.use('/static', express.static(path.resolve('./dist/client')));
 
 
