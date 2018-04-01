@@ -31,14 +31,14 @@ const fuse = FuseBox.init({
 
 fuse.dev({
     port: 4445,
-    httpServer: false
+    // httpServer: false
 });
 
-fuse.bundle('server/bundle')
-    .watch('server/**')
-    .instructions(' > [server/index.js]')
-    // launch and restart express
-    .completed(proc => proc.start())
+// fuse.bundle('server/bundle')
+//     .watch('server/**')
+//     .instructions(' > [server/index.js]')
+//     // launch and restart express
+//     .completed(proc => proc.start())
 
 
 fuse.bundle('client/app')

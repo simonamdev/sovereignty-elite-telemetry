@@ -2,8 +2,10 @@ import time
 
 from flask import Flask, request, abort
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app)
 
 api_header_name = 'API-KEY'
@@ -34,6 +36,7 @@ Websocket Routes
 
 @socketio.on('latency', namespace='/')
 def latency_check(data):
+    print(data)
     current_time = int(round(time.time() * 1000))
     emit('latencyResponse', {'timestamp': current_time, 'timestamp_client': data['timestamp']})
 
