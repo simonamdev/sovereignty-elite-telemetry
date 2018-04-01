@@ -15,5 +15,18 @@
   "bugs": {
     "url": "https://github.com/purrcat259/sovereignty-elite-telemetry/issues"
   },
-  "homepage": "https://github.com/purrcat259/sovereignty-elite-telemetry#readme"
+  "homepage": "https://github.com/purrcat259/sovereignty-elite-telemetry#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-latest": "^6.24.1",
+    "fuse-box": "^2.0.0",
+    "node-sass": "^4.6.0",
+    "tslib": "^1.8.0",
+    "typescript": "^2.1.6",
+    "uglify-js": "^3.1.8"
+  },
+  "dependencies": {
+    "express": "^4.14.1"
+  }
 }

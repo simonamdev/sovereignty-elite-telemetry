@@ -9,6 +9,5 @@ app.use('/static', express.static(path.resolve('./dist/client')));
 
 
 app.listen(3000, () => {
-    console.log('Powered by FuseBox');
     console.log('Example app listening on port 3000!')
 });
