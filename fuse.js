@@ -17,11 +17,12 @@ const fuse = FuseBox.init({
     target: 'browser',
     plugins: [
         EnvPlugin({ NODE_ENV: 'development' }),
-        WebIndexPlugin({
-            path: './static/'
-        }),
-        SVGPlugin(),
-        [SassPlugin(), CSSPlugin()],
+        // WebIndexPlugin({
+        //     // path: './static/'
+        //     path: './'
+        // }),
+        // SVGPlugin(),
+        // [SassPlugin(), CSSPlugin()],
         BabelPlugin({
             limit2project: false
         })

@@ -1,6 +1,6 @@
-import io from 'socket.io-client';
+import * as io from 'socket.io-client';
 
-export default class Client {
+export default class Service {
     constructor(url) {
         this.url = url;
         this.socket = io(url);
@@ -8,7 +8,6 @@ export default class Client {
 
     setup() {
         this.setupConnectionEvents();
-        this.setupHealthEvents();
     }
 
     setupConnectionEvents() {
