@@ -17,9 +17,23 @@ wsService.socket.on('latencyResponse', (response) => {
     let serverTime = response['timestamp'];
     let latency = serverTime - requestTime;
     console.log(`Time sent: ${requestTime}, Time received: ${serverTime}, Latency: ${latency}ms`);
-})
+});
 
-setInterval(() => {
+wsService.socket.on('overlayPositionUpdate', (response) => {
+    console.log(`Response: ${JSON.stringify(response)}`);
+});
+
+wsService
+
+let latencyCheck = setInterval(() => {
     console.log('Checking latency');
     wsService.checkLatency();
 }, 1000);
+
+let positionEmit = setInterval(() => {
+    let x = Math.random() * 10;
+    let y = Math.random() * 10;
+    console.log(`X: ${x}, Y: ${y}`);
+    let timeNow = new Date().getTime();
+    wsService.socket.emit('positionUpdate', { timestamp: timeNow, x: x, y: y });
+}, 100);

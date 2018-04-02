@@ -41,5 +41,11 @@ def latency_check(data):
     emit('latencyResponse', {'timestamp': current_time, 'timestamp_client': data['timestamp']})
 
 
+@socketio.on('positionUpdate', namespace='/')
+def latency_check(data):
+    print('X: {}, Y: {}'.format(data['x'], data['y']))
+    emit('overlayPositionUpdate', data)
+
+
 if __name__ == '__main__':
     socketio.run(app, debug=debug_mode)

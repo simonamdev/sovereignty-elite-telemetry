@@ -1,7 +1,9 @@
 import * as io from 'socket.io-client';
+import * as EventEmitter from 'events';
 
-export default class Service {
+export default class Service extends EventEmitter {
     constructor(url) {
+        super();
         this.url = url;
         this.socket = io(url);
     }
@@ -13,6 +15,7 @@ export default class Service {
     setupConnectionEvents() {
         this.socket.on('error', () => {
             console.log('Error');
+            this.emit('stopLoops');
         });
 
         this.socket.on('connect_failed', () => {
