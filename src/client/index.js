@@ -1,4 +1,5 @@
 import Service from './service';
+import * as PIXI from 'pixi.js'
 
 const testUrl = 'http://localhost:5000/';
 // const testUrl = 'http://127.0.0.1:5000/';
@@ -20,7 +21,7 @@ wsService.socket.on('latencyResponse', (response) => {
 });
 
 wsService.socket.on('overlayPositionUpdate', (response) => {
-    console.log(`Response: ${JSON.stringify(response)}`);
+    console.log(`Position Update Response: ${JSON.stringify(response)}`);
 });
 
 wsService
@@ -33,7 +34,12 @@ let latencyCheck = setInterval(() => {
 let positionEmit = setInterval(() => {
     let x = Math.random() * 10;
     let y = Math.random() * 10;
-    console.log(`X: ${x}, Y: ${y}`);
+    // console.log(`X: ${x}, Y: ${y}`);
     let timeNow = new Date().getTime();
     wsService.socket.emit('positionUpdate', { timestamp: timeNow, x: x, y: y });
-}, 100);
+}, 500);
+
+// Rendering
+
+let app = new PIXI.Application({width: 256, height: 256});
+document.body.appendChild(app.view);
