@@ -1,6 +1,5 @@
 import random
-from time import sleep
-
+import time
 import requests
 
 url = 'http://127.0.0.1:5000/data'
@@ -21,11 +20,12 @@ while True:
     data = {
         'lon': current_lon,
         'lat': current_lat,
-        'heading': heading
+        'heading': heading,
+        'timestamp': int(time.time())
     }
     response = requests.post(
         url=url,
         json=data)
     print(response.status_code, data)
     add_some_movement()
-    sleep(1)
+    time.sleep(1)
