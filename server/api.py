@@ -1,3 +1,4 @@
+import json
 import time
 
 from flask import Flask, request, abort
@@ -27,6 +28,14 @@ API Routes
 @app.route('/')
 def index():
     return 'Index Page'
+
+
+@app.route('/data', methods=['POST'])
+def data():
+    data_dict = request.get_json()
+    print(data_dict)
+    socketio.emit('overlayPositionUpdate', data_dict)
+    return 'OK'
 
 
 """

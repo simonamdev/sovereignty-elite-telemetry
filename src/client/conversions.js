@@ -2,3 +2,15 @@
 export function degreesToRadians(angle) {
     return angle * (Math.PI / 180);
 };
+
+const planetRadiusKm = 524;
+const planetCircumferenceKm = 2 * Math.PI * planetRadiusKm;
+
+export function lonLatToXY(originLon, originLat, lon, lat) {
+    let dx = (lon - originLon) * planetCircumferenceKm * Math.cos((originLat + lat) * Math.PI / 360) / 360;
+    let dy = (originLat - lat) * planetCircumferenceKm / 360;
+    return {
+        x: dx,
+        y: dy
+    };
+}
