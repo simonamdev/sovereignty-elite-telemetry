@@ -6,7 +6,8 @@ const {
     SassPlugin,
     CSSPlugin,
     EnvPlugin,
-    SVGPlugin
+    SVGPlugin,
+    ImageBase64Plugin
 } = require("fuse-box");
 
 const fuse = FuseBox.init({
@@ -17,12 +18,13 @@ const fuse = FuseBox.init({
     target: 'browser',
     plugins: [
         EnvPlugin({ NODE_ENV: 'development' }),
+        ImageBase64Plugin(),
         // WebIndexPlugin({
         //     // path: './static/'
         //     path: './'
         // }),
         // SVGPlugin(),
-        // [SassPlugin(), CSSPlugin()],
+        [SassPlugin(), CSSPlugin()],
         BabelPlugin({
             limit2project: false
         })

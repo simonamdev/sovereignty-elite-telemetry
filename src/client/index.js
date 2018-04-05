@@ -1,8 +1,14 @@
 import Service from './service';
 import * as PIXI from 'pixi.js'
 
-const testUrl = 'http://localhost:5000/';
-// const testUrl = 'http://127.0.0.1:5000/';
+import * as viperImage from './images/test-viper.png';
+import * as arenaImage from './images/isola1-small.jpg';
+
+import { degreesToRadians } from './conversions';
+
+import './scss/index.scss';
+
+const testUrl = 'http://127.0.0.1:5000/';
 
 console.log('Setting up comms');
 const wsService = new Service(testUrl);
@@ -13,6 +19,10 @@ wsService.setup();
 //     console.log(inVar);
 // });
 
+let x = 0.0;
+let y = 0.0;
+let heading = 0.0;
+
 wsService.socket.on('latencyResponse', (response) => {
     let requestTime = response['timestamp_client'];
     let serverTime = response['timestamp'];
@@ -22,24 +32,76 @@ wsService.socket.on('latencyResponse', (response) => {
 
 wsService.socket.on('overlayPositionUpdate', (response) => {
     console.log(`Position Update Response: ${JSON.stringify(response)}`);
+    x = response.x;
+    y = response.y;
+    heading = degreesToRadians(response.heading);
 });
 
-wsService
-
-let latencyCheck = setInterval(() => {
-    console.log('Checking latency');
-    wsService.checkLatency();
-}, 1000);
-
+// let latencyCheck = setInterval(() => {
+//     console.log('Checking latency');
+//     wsService.checkLatency();
+// }, 1000);
+//
 let positionEmit = setInterval(() => {
-    let x = Math.random() * 10;
-    let y = Math.random() * 10;
+    let x = Math.random() * 560;
+    let y = Math.random() * 560;
+    let heading = Math.random() * 360;
     // console.log(`X: ${x}, Y: ${y}`);
     let timeNow = new Date().getTime();
-    wsService.socket.emit('positionUpdate', { timestamp: timeNow, x: x, y: y });
+    let data = {
+        timestamp: timeNow,
+        x: x,
+        y: y,
+        heading: heading
+    };
+    wsService.socket.emit('positionUpdate', data);
 }, 500);
 
-// Rendering
+// Rendering Part
+let app = new PIXI.Application({width: 1920, height: 1080});
 
-let app = new PIXI.Application({width: 256, height: 256});
+// Load in image of the arena
+let image = new Image();
+image.src = arenaImage;
+let arenaTex = new PIXI.BaseTexture(image);
+let texture = new PIXI.Texture(arenaTex);
+PIXI.Texture.addToCache(texture, 'arena');
+let arenaTex = PIXI.Sprite.fromImage('arena');
+
+// Add the arena image
+app.stage.addChild(arenaTex);
+
+// Load in the image of the viper
+let image = new Image();
+image.src = viperImage;
+let viperTex = new PIXI.BaseTexture(image);
+let texture = new PIXI.Texture(viperTex);
+PIXI.Texture.addToCache(texture, 'viper');
+let viper = PIXI.Sprite.fromImage('viper');
+
+viper.width = 32;
+viper.height = 32;
+
+// Set the rotation anchor point by the center
+viper.anchor.x = 0.5;
+viper.anchor.y = 0.5;
+
+// Add the viper
+app.stage.addChild(viper);
+
+// Start the loop
+let gameLoop = (delta) => {
+    viper.x = x;
+    viper.y = y;
+    viper.rotation = heading;
+}
+
+app.ticker.add(delta => gameLoop(delta));
+
+// Resize to fit the window
+app.renderer.view.style.position = 'absolute';
+app.renderer.view.style.display = 'block';
+app.renderer.autoResize = true;
+app.renderer.resize(window.innerWidth, window.innerHeight);
+
 document.body.appendChild(app.view);
