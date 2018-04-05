@@ -1,20 +1,18 @@
-import random
 import time
 import requests
 
 url = 'http://127.0.0.1:5000/data'
 
-current_lon = 43.617710
-current_lat = -64.589546
-heading = 225
+# Pad 5
+current_lon = 43.623199
+current_lat = -64.590439
+heading = 109
 
+# Pad 6
+# current_lon = 43.603252
+# current_lat = -64.614822
+# heading = 109
 
-def add_some_movement():
-    global current_lon, current_lon, heading
-    # change these additions
-    current_lon += random.randint(0, 0)
-    current_lon += random.randint(0, 0)
-    # heading += 45
 
 while True:
     data = {
@@ -27,5 +25,4 @@ while True:
         url=url,
         json=data)
     print(response.status_code, data)
-    add_some_movement()
     time.sleep(1)

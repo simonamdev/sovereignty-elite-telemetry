@@ -9,6 +9,7 @@ const planetCircumferenceKm = 2 * Math.PI * planetRadiusKm;
 export function lonLatToXY(originLon, originLat, lon, lat) {
     let dx = (lon - originLon) * planetCircumferenceKm * Math.cos((originLat + lat) * Math.PI / 360) / 360;
     let dy = (originLat - lat) * planetCircumferenceKm / 360;
+    console.log('dx: ' + dx + ', dy: ' + dy);
     return {
         x: dx,
         y: dy
