@@ -1,11 +1,12 @@
 import Service from './service';
 import * as PIXI from 'pixi.js'
 
+import * as circleImage from './images/circle.png';
 import * as triangleImage from './images/triangle.png';
 import * as viperImage from './images/test-viper.png';
-import * as arenaImage from './images/isola1-small.jpg';
+import * as arenaImage from './images/isola2-small.jpg';
 
-import { degreesToRadians, lonLatToXY } from './conversions';
+import { degreesToRadians, lonLatToXY, normalise } from './conversions';
 
 import './scss/index.scss';
 
@@ -13,25 +14,33 @@ import './scss/index.scss';
 const width = 1920;
 const height = 1080;
 
+// Centre of image co-ordinates:
+
+// OLD CENTRE, ABOVE THE PIPES
+// const centreLon = 43.54425;
+// const centreLat = -64.459335;
+
+// CENTRE JUST ABOVE THE SQUARE PLATFORM BELOW THE SPIRES
+const centreLon = 43.428566;
+const centreLat = -64.492012;
+const centreHeading = 65;
+
 const testUrl = 'http://127.0.0.1:5000/';
 const shipImageSideSize = 70;
 const imageScale = 1;
-const imageOffsetAngle = 0;
+const imageOffsetAngle = centreHeading;
 const imageX = 960;
 const imageY = 540;
 // const imageY = window.innerHeight / 2;
 
 const headingOffset = 0; // Heading does not point directly up in the image
 // const headingOffset = 116; // Heading does not point directly up in the image
-const originLon = 43.460500;
-const originLat = -64.534150;
+// const originLon = 43.460500;
+// const originLat = -64.534150;
 // const originLon = 42.622185;
 // const originLat = -64.288918;
 
-// Centre of image co-ordinates:
-const centreLon = 43.54425;
-const centreLat = -64.459335;
-const centreHeading = 65;
+
 
 // Planet details
 // Pad numbers are LEFT TO RIGHT not actual pad numbers
@@ -85,14 +94,14 @@ let pads = [
     },
     {
         'number': 7,
-        'lon': 43.623196,
-        'lat': -64.590424,
+        'lon': 43.603245,
+        'lat': -64.614822,
         'heading': 284
     },
     {
         'number': 8,
-        'lon': 43.598091,
-        'lat': -64.613457,
+        'lon': 43.623199,
+        'lat': -64.590424,
         'heading': 289
     }
 ];
@@ -212,29 +221,68 @@ let debugText = new PIXI.Text(
 );
 // app.stage.addChild(debugText); // Do not add the text
 
+let mapNormalisedPositionToCentre = (x, y) => {
+    return {
+        x: (width * 0.5) + (width * 0.5 * x),
+        y: (height * 0.5) + (height * 0.5 * x)
+    };
+};
+
+// Place the centre point
+let image = new Image();
+image.src = circleImage;
+let circleTex = new PIXI.BaseTexture(image);
+let texture = new PIXI.Texture(circleTex);
+PIXI.Texture.addToCache(texture, 'circle');
+let position = lonLatToXY(centreLon, centreLat, centreLon, centreLat);
+console.log(position);
+let circle = PIXI.Sprite.fromImage('circle');
+let centrePos = mapNormalisedPositionToCentre(position.x, position.y);
+console.log(`X: ${centrePos.x}, Y: ${centrePos.y}`);
+circle.anchor.x = 0.5;
+circle.anchor.y = 0.5;
+circle.x = centrePos.x;
+circle.y = centrePos.y;
+circle.scale.x = 0.05;
+circle.scale.y = 0.05;
+app.stage.addChild(circle);
+
+// Load in the triangle image
 let image = new Image();
 image.src = triangleImage;
 let triTex = new PIXI.BaseTexture(image);
 let texture = new PIXI.Texture(triTex);
 PIXI.Texture.addToCache(texture, 'triangle');
 // Add the pad triangles
-for (let i = 0; i < pads.length; i++) {
+for (let i = 6; i < pads.length; i++) {
     let pad = pads[i];
-    console.log(pad);
+    // console.log(pad);
     let triangle = PIXI.Sprite.fromImage('triangle');
-    let position = lonLatToXY(originLon, originLat, pad.lon, pad.lat);
-    // let position = lonLatToXY(centreLon, centreLat, pad.lon, pad.lat);
-    let x = position.x * width;
-    let y = position.y * height;
-    triangle.x = x;
-    triangle.y = y;
+    // let position = lonLatToXY(originLon, originLat, pad.lon, pad.lat);
+    console.log(`Original: Lon: ${pad.lon}, Lat: ${pad.lat}`);
+    let lon = centreLon - pad.lon;
+    let lat = centreLat - pad.lat;
+    console.log(`Normalised: Lon: ${lon}, Lat: ${lat}`);
+    let position = lonLatToXY(0, 0, lon, lat);
+    console.log(`Normalised X: ${position.x}, Y: ${position.y}`);
+    position = mapNormalisedPositionToCentre(position.x, position.y);
+    console.log(`Mapped X: ${position.x}, Y: ${position.y}`);
+    triangle.x = position.x;
+    triangle.y = position.y;
     triangle.anchor.x = 0.5;
     triangle.anchor.y = 0.5;
     const triangleScale = 0.1;
     triangle.scale.x = triangleScale;
     triangle.scale.y = triangleScale;
-    triangle.rotation = degreesToRadians(pad['heading']);
-    app.stage.addChild(triangle); // Do not add the text
+    triangle.rotation = degreesToRadians(pad.heading);
+    app.stage.addChild(triangle);
+    let posText = new PIXI.Text(
+        `Pad: ${pad.number}, X: ${parseInt(position.x)}, Y: ${parseInt(position.y)}, Heading: ${pad.heading}`,
+        {align: 'center', fill: '#ffffff'}
+    );
+    posText.x = position.x;
+    posText.y = position.y;
+    app.stage.addChild(posText);
 }
 
 // Start the loop

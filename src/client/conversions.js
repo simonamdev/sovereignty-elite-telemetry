@@ -14,4 +14,8 @@ export function lonLatToXY(originLon, originLat, lon, lat) {
         x: dx,
         y: dy
     };
-}
+};
+
+export function normalise(num, min, man) {
+    return (num - min) / (max - min);
+};
