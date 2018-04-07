@@ -29,6 +29,7 @@
     "uglify-js": "^3.1.8"
   },
   "dependencies": {
+    "@nasaworldwind/worldwind": "^0.9.0",
     "cors": "^2.8.4",
     "express": "^4.14.1",
     "express-ws": "^3.0.0",

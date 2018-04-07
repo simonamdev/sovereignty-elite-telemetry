@@ -263,7 +263,7 @@ for (let i = 6; i < pads.length; i++) {
     let lon = centreLon - pad.lon;
     let lat = centreLat - pad.lat;
     console.log(`Normalised: Lon: ${lon}, Lat: ${lat}`);
-    let position = lonLatToXY(0, 0, lon, lat);
+    let position = lonLatToXY(0.0, 0.0, lon, lat);
     console.log(`Normalised X: ${position.x}, Y: ${position.y}`);
     position = mapNormalisedPositionToCentre(position.x, position.y);
     console.log(`Mapped X: ${position.x}, Y: ${position.y}`);
