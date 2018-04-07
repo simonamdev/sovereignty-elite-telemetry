@@ -7,13 +7,9 @@ const planetRadiusKm = 524;
 const planetCircumferenceKm = 2 * Math.PI * planetRadiusKm;
 
 export function lonLatToXY(originLon, originLat, lon, lat) {
-    // let dx = (lon - originLon) * planetCircumferenceKm * Math.cos((originLat + lat) * Math.PI / 360) / 360;
-    // let dy = (originLat - lat) * planetCircumferenceKm / 360;
+    let dx = (lon - originLon) * planetCircumferenceKm * Math.cos((originLat + lat) * Math.PI / 360) / 360;
+    let dy = (originLat - lat) * planetCircumferenceKm / 360;
     // console.log('dx: ' + dx + ', dy: ' + dy);
-    lat = degreesToRadians(lat);
-    lon = degreesToRadians(lon);
-    let dx = planetRadiusKm * Math.cos(lat) * Math.sin(lon + degreesToRadians(180));
-    let dy = planetRadiusKm * Math.sin(-lat);
     return {
         x: dx,
         y: dy

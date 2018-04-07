@@ -235,6 +235,7 @@ let circleTex = new PIXI.BaseTexture(image);
 let texture = new PIXI.Texture(circleTex);
 PIXI.Texture.addToCache(texture, 'circle');
 let position = lonLatToXY(centreLon, centreLat, centreLon, centreLat);
+console.log(degreesToRadians(centreLat));
 console.log(position);
 let circle = PIXI.Sprite.fromImage('circle');
 let centrePos = mapNormalisedPositionToCentre(position.x, position.y);
@@ -248,42 +249,42 @@ circle.scale.y = 0.05;
 app.stage.addChild(circle);
 
 // Load in the triangle image
-let image = new Image();
-image.src = triangleImage;
-let triTex = new PIXI.BaseTexture(image);
-let texture = new PIXI.Texture(triTex);
-PIXI.Texture.addToCache(texture, 'triangle');
-// Add the pad triangles
-for (let i = 6; i < pads.length; i++) {
-    let pad = pads[i];
-    // console.log(pad);
-    let triangle = PIXI.Sprite.fromImage('triangle');
-    // let position = lonLatToXY(originLon, originLat, pad.lon, pad.lat);
-    console.log(`Original: Lon: ${pad.lon}, Lat: ${pad.lat}`);
-    let lon = centreLon - pad.lon;
-    let lat = centreLat - pad.lat;
-    console.log(`Normalised: Lon: ${lon}, Lat: ${lat}`);
-    let position = lonLatToXY(0.0, 0.0, lon, lat);
-    console.log(`Normalised X: ${position.x}, Y: ${position.y}`);
-    position = mapNormalisedPositionToCentre(position.x, position.y);
-    console.log(`Mapped X: ${position.x}, Y: ${position.y}`);
-    triangle.x = position.x;
-    triangle.y = position.y;
-    triangle.anchor.x = 0.5;
-    triangle.anchor.y = 0.5;
-    const triangleScale = 0.1;
-    triangle.scale.x = triangleScale;
-    triangle.scale.y = triangleScale;
-    triangle.rotation = degreesToRadians(pad.heading);
-    app.stage.addChild(triangle);
-    let posText = new PIXI.Text(
-        `Pad: ${pad.number}, X: ${parseInt(position.x)}, Y: ${parseInt(position.y)}, Heading: ${pad.heading}`,
-        {align: 'center', fill: '#ffffff'}
-    );
-    posText.x = position.x;
-    posText.y = position.y;
-    app.stage.addChild(posText);
-}
+// let image = new Image();
+// image.src = triangleImage;
+// let triTex = new PIXI.BaseTexture(image);
+// let texture = new PIXI.Texture(triTex);
+// PIXI.Texture.addToCache(texture, 'triangle');
+// // Add the pad triangles
+// for (let i = 6; i < pads.length; i++) {
+//     let pad = pads[i];
+//     // console.log(pad);
+//     let triangle = PIXI.Sprite.fromImage('triangle');
+//     // let position = lonLatToXY(originLon, originLat, pad.lon, pad.lat);
+//     console.log(`Original: Lon: ${pad.lon}, Lat: ${pad.lat}`);
+//     let lon = centreLon - pad.lon;
+//     let lat = centreLat - pad.lat;
+//     console.log(`Normalised: Lon: ${lon}, Lat: ${lat}`);
+//     let position = lonLatToXY(0.0, 0.0, lon, lat);
+//     console.log(`Normalised X: ${position.x}, Y: ${position.y}`);
+//     position = mapNormalisedPositionToCentre(position.x, position.y);
+//     console.log(`Mapped X: ${position.x}, Y: ${position.y}`);
+//     triangle.x = position.x;
+//     triangle.y = position.y;
+//     triangle.anchor.x = 0.5;
+//     triangle.anchor.y = 0.5;
+//     const triangleScale = 0.1;
+//     triangle.scale.x = triangleScale;
+//     triangle.scale.y = triangleScale;
+//     triangle.rotation = degreesToRadians(pad.heading);
+//     app.stage.addChild(triangle);
+//     let posText = new PIXI.Text(
+//         `Pad: ${pad.number}, X: ${parseInt(position.x)}, Y: ${parseInt(position.y)}, Heading: ${pad.heading}`,
+//         {align: 'center', fill: '#ffffff'}
+//     );
+//     posText.x = position.x;
+//     posText.y = position.y;
+//     app.stage.addChild(posText);
+// }
 
 // Start the loop
 let gameLoop = (delta) => {
