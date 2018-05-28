@@ -23,6 +23,8 @@ while True:
                 if line[0] == '{':
                     data = json.loads(line)
         # print(data)
+        if not data['Longitude']:
+            continue
         post_data = {
             'lon': data['Longitude'],
             'lat': data['Latitude'],

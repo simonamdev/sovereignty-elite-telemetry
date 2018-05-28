@@ -19,10 +19,10 @@ const fuse = FuseBox.init({
     plugins: [
         EnvPlugin({ NODE_ENV: 'development' }),
         ImageBase64Plugin(),
-        // WebIndexPlugin({
-        //     // path: './static/'
-        //     path: './'
-        // }),
+        WebIndexPlugin({
+            // path: './static/'
+            path: './'
+        }),
         // SVGPlugin(),
         [SassPlugin(), CSSPlugin()],
         BabelPlugin({

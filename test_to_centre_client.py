@@ -2,7 +2,7 @@ import json
 import time
 import requests
 
-path = 'data/isola_square.json'
+path = 'data/isola_top_left_to_centre.json'
 url = 'http://127.0.0.1:5000/data'
 
 with open(path, 'r') as data_file:
