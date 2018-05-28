@@ -3,6 +3,10 @@ export function degreesToRadians(angle) {
     return angle * (Math.PI / 180);
 };
 
+export function radiansToDegrees(angle) {
+    return (angle * 180) / Math.PI;
+};
+
 const planetRadiusKm = 524;
 const planetCircumferenceKm = 2 * Math.PI * planetRadiusKm;
 
