@@ -9,6 +9,8 @@ import * as arenaImage from './images/isola3-large.jpg';
 
 import { degreesToRadians, lonLatToXY, normalise } from './conversions';
 
+import Pilot from './models/pilot';
+
 import './scss/index.scss';
 
 // Currently hardcoded at 1920x1080, but ideally we get the width of the window
@@ -46,6 +48,8 @@ wsService.setup();
 //     console.log(inVar);
 // });
 
+let contestantData = {};
+
 let x = 0.0;
 let y = 0.0;
 let lon = 0.0;
@@ -56,28 +60,55 @@ let debugInfo = '';
 
 // RIGHT BEHIND PAD: 43.682201, -64.596343, 289
 
-wsService.socket.on('latencyResponse', (response) => {
-    let requestTime = response['timestamp_client'];
-    let serverTime = response['timestamp'];
-    let latency = serverTime - requestTime;
-    console.log(`Time sent: ${requestTime}, Time received: ${serverTime}, Latency: ${latency}ms`);
+// wsService.socket.on('latencyResponse', (response) => {
+//     let requestTime = response['timestamp_client'];
+//     let serverTime = response['timestamp'];
+//     let latency = serverTime - requestTime;
+//     console.log(`Time sent: ${requestTime}, Time received: ${serverTime}, Latency: ${latency}ms`);
+// });
+
+wsService.socket.on('overlayPositionUpdate', (data) => {
+    console.log(`Position Update data: ${JSON.stringify(data)}`);
+    updatePilotData(data);
 });
 
-wsService.socket.on('overlayPositionUpdate', (response) => {
-    console.log(`Position Update Response: ${JSON.stringify(response)}`);
-    lon = response.lon;
-    lat = response.lat;
-    // addCircle(lon, lat);
-    // Values need to be mapped
-    let position = lonLatToXY(originLon, originLat, lon, lat);
-    // x = position.x * width;
-    x = Math.abs(position.x) * 32 + 200;
-    // y = position.y * height;
-    y = Math.abs(position.y) * 24 - 12;
-    console.log(`X: ${x}, Y: ${y}`);
-    heading = degreesToRadians(response.heading + headingOffset);
-    altitude = response.altitude;
-});
+let updatePilotData = (data) => {
+    let contestantNames = getContestantNames();
+    let pilotAlreadyRegistered = inArray(data.name, contestantNames);
+    if (pilotAlreadyRegistered) {
+        // Update data
+        contestantData[data.name].updateLocation(
+            data.lon,
+            data.lat,
+            data.heading
+        );
+    } else {
+        // Init image and pass to new pilot
+        let pixiData = initialiseShipImage(data);
+        let image = pixiData[0];
+        let text = pixiData[1];
+        contestantData[data.name] = new Pilot(
+            data.name,
+            data.isContestant,
+            {
+                lon: data.lon,
+                lat: data.lat,
+                heading: data.heading
+            },
+            data.ship,
+            image,
+            text
+        );
+    }
+};
+
+let getContestantNames = () => {
+    return Object.keys(contestantData);
+};
+
+let inArray = (val, arr) => {
+    return arr.indexOf(val) >= 0;
+};
 
 // let latencyCheck = setInterval(() => {
 //     console.log('Checking latency');
@@ -116,44 +147,76 @@ arenaTex.x = imageX;
 arenaTex.y = imageY;
 arenaTex.scale.x = imageScale;
 arenaTex.scale.y = imageScale;
-
 // Add the arena image
 app.stage.addChild(arenaTex);
 
-// Load in the image of the viper
-let image = new Image();
-image.src = viperImage;
-let viperTex = new PIXI.BaseTexture(image);
-let texture = new PIXI.Texture(viperTex);
-PIXI.Texture.addToCache(texture, 'viper');
-let viper = PIXI.Sprite.fromImage('viper');
+let initialiseShipImage = (data) => {
+    console.log(`Initialising image for pilot: ${data.name}`);
+    // Load in the image of the viper
+    let image = new Image();
+    image.src = viperImage;
+    let viperTex = new PIXI.BaseTexture(image);
+    let texture = new PIXI.Texture(viperTex);
+    PIXI.Texture.addToCache(texture, `viper-${data.name}`);
+    let viper = PIXI.Sprite.fromImage(`viper-${data.name}`);
 
-viper.width = shipImageSideSize;
-viper.height = shipImageSideSize;
+    viper.width = shipImageSideSize;
+    viper.height = shipImageSideSize;
 
-// Set the rotation anchor point by the center
-viper.anchor.x = 0.5;
-viper.anchor.y = 0.5;
+    // Set the rotation anchor point by the center
+    viper.anchor.x = 0.5;
+    viper.anchor.y = 0.5;
 
-// Add the viper
-app.stage.addChild(viper);
+    // Add the viper
+    app.stage.addChild(viper);
 
-debugInfo = `Lon: ${lon},
-Lat: ${lat},
-X: ${x},
-Y: ${y},
-Heading: ${heading},
-Altitude: ${altitude}`;
+    // Add the debug text
+    let debugText = new PIXI.Text(
+        'Waiting for Data',
+        {
+            align: 'center',
+            fill: '#ffffff'
+        }
+    );
 
-// Add the debug text
-let debugText = new PIXI.Text(
-    debugInfo,
-    {
-        align: 'center',
-        fill: '#ffffff'
-    }
-);
-// app.stage.addChild(debugText); // Do not add the text
+    app.stage.addChild(debugText);
+
+    return [viper, debugText];
+};
+
+let updateShipImage = (pilot) => {
+    // console.log(`Updating image location for ${pilot.name}`);
+    let location = pilot.location;
+    // Values need to be mapped
+    let position = lonLatToXY(originLon, originLat, location.lon, location.lat);
+    let x = Math.abs(position.x) * 32 + 200;
+    let y = Math.abs(position.y) * 24 - 12;
+    // console.log(`[${pilot.name}] X: ${x}, Y: ${y}`);
+    let heading = degreesToRadians(location.heading + headingOffset);
+    let shipImage = pilot.image;
+
+    // Update ship image
+    shipImage.rotation = heading;
+    shipImage.x = x;
+    shipImage.y = y;
+
+    // // Update debug info
+    let headingInDegrees = parseInt((heading * 180) / Math.PI);
+    let debugInfo = `
+    Name: ${pilot.name},
+    Lon: ${lon},
+    Lat: ${lat},
+    X: ${x},
+    Y: ${y},
+    Heading: ${headingInDegrees}`;
+
+    let debugText = pilot.text;
+
+    debugText.text = debugInfo;
+    debugText.position.x = x;
+    debugText.position.y = y;
+};
+
 
 let mapNormalisedPositionToCentre = (x, y) => {
     return {
@@ -162,50 +225,40 @@ let mapNormalisedPositionToCentre = (x, y) => {
     };
 };
 
-let addCircle = (lon, lat) => {
-    let image = new Image();
-    image.src = circleImage;
-    let circleTex = new PIXI.BaseTexture(image);
-    let texture = new PIXI.Texture(circleTex);
-    PIXI.Texture.addToCache(texture, 'circle');
-    let position = lonLatToXY(originLon, originLat, lon, lat);
-    console.log(position);
-    let circle = PIXI.Sprite.fromImage('circle');
-    // let centrePos = mapNormalisedPositionToCentre(position.x, position.y);
-    // console.log(`X: ${centrePos.x}, Y: ${centrePos.y}`);
-    circle.anchor.x = 0.5;
-    circle.anchor.y = 0.5;
-    circle.x = Math.abs(position.x) * 32.0;
-    // circle.x = position.x;
-    circle.y = Math.abs(position.y) * 24.0;
-    // circle.y = position.y;
-    console.log(`X: ${position.x}, Y: ${position.y}`);
-    circle.scale.x = 0.025;
-    circle.scale.y = 0.025;
-    app.stage.addChild(circle);
-}
-
-
+// let addCircle = (lon, lat) => {
+//     let image = new Image();
+//     image.src = circleImage;
+//     let circleTex = new PIXI.BaseTexture(image);
+//     let texture = new PIXI.Texture(circleTex);
+//     PIXI.Texture.addToCache(texture, 'circle');
+//     let position = lonLatToXY(originLon, originLat, lon, lat);
+//     console.log(position);
+//     let circle = PIXI.Sprite.fromImage('circle');
+//     // let centrePos = mapNormalisedPositionToCentre(position.x, position.y);
+//     // console.log(`X: ${centrePos.x}, Y: ${centrePos.y}`);
+//     circle.anchor.x = 0.5;
+//     circle.anchor.y = 0.5;
+//     circle.x = Math.abs(position.x) * 32.0;
+//     // circle.x = position.x;
+//     circle.y = Math.abs(position.y) * 24.0;
+//     // circle.y = position.y;
+//     console.log(`X: ${position.x}, Y: ${position.y}`);
+//     circle.scale.x = 0.025;
+//     circle.scale.y = 0.025;
+//     app.stage.addChild(circle);
+// }
 // Place the top left point
 // addCircle(originLon, originLat);
 
 // Start the loop
 let gameLoop = (delta) => {
-    // Update viper image
-    viper.rotation = heading;
-    viper.x = x;
-    viper.y = y;
-    // Update debug info
-    let headingInDegrees = parseInt((heading * 180) / Math.PI);
-    debugInfo = `Lon: ${lon},
-    Lat: ${lat},
-    X: ${x},
-    Y: ${y},
-    Heading: ${headingInDegrees},
-    Altitude: ${altitude}`;
-    debugText.text = debugInfo;
-    debugText.position.x = x;
-    debugText.position.y = y
+    let pilotNames = getContestantNames();
+    for (let i = 0; i < pilotNames.length; i++) {
+        let pilot = pilotNames[i];
+        if (contestantData.hasOwnProperty(pilot)) {
+            updateShipImage(contestantData[pilot]);
+        }
+    }
 }
 
 app.ticker.add(delta => gameLoop(delta));
