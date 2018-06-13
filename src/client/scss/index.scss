@@ -2,3 +2,13 @@ body {
     margin: 0;
     padding: 0;
 }
+
+#sidePane {
+    position: absolute;
+    z-index: 1000;
+    height: 100%;
+    width: (100% / 7);
+    left: 100% - (100% / 7);
+    top: 0;
+    background-color: red;
+}

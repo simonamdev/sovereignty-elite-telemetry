@@ -10,8 +10,13 @@ import * as arenaImage from './images/isola3-large.jpg';
 import { degreesToRadians, lonLatToXY, normalise } from './conversions';
 
 import Pilot from './models/pilot';
+import Pane from './pane';
 
 import './scss/index.scss';
+
+// Create side Pane
+let pane = new Pane();
+pane.createPane();
 
 // Currently hardcoded at 1920x1080, but ideally we get the width of the window
 const width = 1920;
@@ -169,6 +174,12 @@ let initialiseShipImage = (data) => {
 
     // Add the viper
     app.stage.addChild(viper);
+
+    viper.interactive = true;
+    viper.buttonMode = true;
+    viper.on('pointerdown', (event) => {
+        pane.showPane();
+    });
 
     // Add the debug text
     let debugText = new PIXI.Text(
