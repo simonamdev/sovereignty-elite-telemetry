@@ -2,6 +2,8 @@ export default class Pane {
     constructor() {
         this.hidden = true;
         this.div = null;
+        this.pilot = null;
+        this.name = null;
         this.exitButton = null;
     }
 
@@ -13,14 +15,23 @@ export default class Pane {
         this.hidePane();
     }
 
-    showPane() {
+    showPane(name) {
         this.div.style.display = 'block';
         this.hidden = false;
+        this.name = name;
     }
 
     hidePane() {
         this.div.style.display = 'none';
         this.hidden = true;
+        this.pilot = null;
+    }
+
+    updatePane(pilot) {
+        if (pilot.name === this.name) {
+            this.pilot = pilot;
+
+        }
     }
 
     addExitOption() {

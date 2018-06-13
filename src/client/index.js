@@ -178,7 +178,7 @@ let initialiseShipImage = (data) => {
     viper.interactive = true;
     viper.buttonMode = true;
     viper.on('pointerdown', (event) => {
-        pane.showPane();
+        pane.showPane(data.name);
     });
 
     // Add the debug text
@@ -268,6 +268,7 @@ let gameLoop = (delta) => {
         let pilot = pilotNames[i];
         if (contestantData.hasOwnProperty(pilot)) {
             updateShipImage(contestantData[pilot]);
+            // pane.updatePane(contestantData[pilot]);
         }
     }
 }
